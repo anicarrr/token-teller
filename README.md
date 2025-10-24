@@ -1,4 +1,4 @@
-# Crypto Oracle Fortune Prototype
+# Token Teller Fortune Prototype
 
 An interactive web application that connects to users' crypto wallets, retrieves token balances, and uses AI to generate personalized "fortunes" based on BaZi (Chinese Four Pillars of Destiny). Users can interact with the app, asking follow-up questions about their fortunes or holdings, with AI providing dynamic, metaphysics-inspired responses.
 

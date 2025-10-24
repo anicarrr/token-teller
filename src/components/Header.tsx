@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Wallet, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { fetchTokenBalances, TokenBalance } from '@/lib/tokenFetcher'
+import { TokenBalance } from '@/lib/balanceService'
 import { WalletConnect } from './WalletConnect'
 
 export function Header() {
@@ -21,8 +21,23 @@ export function Header() {
     if (!address) return
     setLoading(true)
     try {
-      const data = await fetchTokenBalances(address, 1) // Default to Ethereum
-      setBalances(data)
+      const response = await fetch('/api/balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          address,
+          chainIds: [11155111, 7001] // Ethereum Sepolia and ZetaChain testnet
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch balances')
+      }
+
+      const data = await response.json()
+      setBalances(data.balances)
     } catch (error) {
       console.error('Error fetching balances:', error)
     } finally {
@@ -43,7 +58,7 @@ export function Header() {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <h1 className="text-2xl font-bold mystical-text cursor-pointer" onClick={() => window.location.href = '/'}>
-            Crypto Oracle
+            Token Teller
           </h1>
         </div>
 
@@ -91,7 +106,7 @@ export function Header() {
                     ) : (
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">Total Value</span>
+                          <span className="text-sm font-medium">Total Value USD</span>
                           <Badge variant="secondary" className="mystical-gradient text-white">
                             ${totalUsdValue.toFixed(2)}
                           </Badge>
@@ -101,7 +116,10 @@ export function Header() {
                           <h4 className="text-sm font-medium">Token Balances</h4>
                           {balances.filter(token => parseFloat(token.balance) > 0).map((token, index) => (
                             <div key={index} className="flex justify-between items-center text-sm">
-                              <span>{token.symbol}</span>
+                              <div>
+                                <span>{token.symbol}</span>
+                                <p className="text-xs text-muted-foreground">{token.chainName}</p>
+                              </div>
                               <div className="text-right">
                                 <p>{parseFloat(token.balance).toFixed(4)}</p>
                                 {token.usdValue && (

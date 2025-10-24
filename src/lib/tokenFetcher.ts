@@ -14,7 +14,7 @@ export interface TokenBalance {
 export async function fetchTokenBalances(address: string, chainId: number): Promise<TokenBalance[]> {
   const tokens = tokenList[chainId as keyof typeof tokenList] || []
   const provider = new ethers.JsonRpcProvider(
-    chainId === 1 ? process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL : process.env.NEXT_PUBLIC_ZETACHAIN_RPC_URL
+    (chainId === 1 || chainId === 11155111) ? process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL : process.env.NEXT_PUBLIC_ZETACHAIN_RPC_URL
   )
 
   const balances: TokenBalance[] = []
@@ -33,7 +33,21 @@ export async function fetchTokenBalances(address: string, chainId: number): Prom
   for (const token of tokens) {
     if (token.address === ethers.ZeroAddress) continue // Skip native
     try {
+      // Validate contract address format
+      if (!ethers.isAddress(token.address)) {
+        console.error(`Invalid address format for ${token.symbol}: ${token.address}`)
+        continue
+      }
+
       const contract = new ethers.Contract(token.address, ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)', 'function symbol() view returns (string)', 'function name() view returns (string)'], provider)
+      
+      // Check if contract exists by getting code
+      const code = await provider.getCode(token.address)
+      if (code === '0x') {
+        console.error(`No contract found at address ${token.address} for ${token.symbol}`)
+        continue
+      }
+
       const balance = await contract.balanceOf(address)
       const formattedBalance = ethers.formatUnits(balance, token.decimals)
       balances.push({
@@ -44,7 +58,8 @@ export async function fetchTokenBalances(address: string, chainId: number): Prom
         address: token.address,
       })
     } catch (error) {
-      console.error(`Error fetching balance for ${token.symbol}:`, error)
+      console.error(`Error fetching balance for ${token.symbol} at ${token.address}:`, error)
+      // Continue with other tokens even if one fails
     }
   }
 
@@ -57,6 +72,7 @@ export async function fetchTokenBalances(address: string, chainId: number): Prom
 async function addUsdValues(balances: TokenBalance[], chainId: number) {
   const coinIds: Record<number, Record<string, string>> = {
     1: { 'ETH': 'ethereum', 'USDC': 'usd-coin', 'DAI': 'dai', 'LINK': 'chainlink', 'UNI': 'uniswap', 'AAVE': 'aave' },
+    11155111: { 'ETH': 'ethereum', 'USDC': 'usd-coin', 'DAI': 'dai', 'LINK': 'chainlink' }, // Sepolia testnet - same prices as mainnet
     7001: { 'ZETA': 'zeta', 'ETH': 'ethereum' },
   }
 

@@ -1,5 +1,5 @@
 import { http, createConfig } from 'wagmi'
-import { mainnet } from 'viem/chains'
+import { sepolia } from 'viem/chains'
 import { defineChain } from 'viem'
 
 const zetaChainTestnet = defineChain({
@@ -23,9 +23,9 @@ const zetaChainTestnet = defineChain({
 })
 
 export const config = createConfig({
-  chains: [mainnet, zetaChainTestnet],
+  chains: [sepolia, zetaChainTestnet],
   transports: {
-    [mainnet.id]: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
     [zetaChainTestnet.id]: http(process.env.NEXT_PUBLIC_ZETACHAIN_RPC_URL),
   },
 })
