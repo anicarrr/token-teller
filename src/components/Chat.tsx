@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useChat } from '@/hooks/useChat'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -21,6 +22,8 @@ export function Chat({ address, chainId }: ChatProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
+  const chatMutation = useChat()
+
   const handleSend = async () => {
     if (!input.trim()) return
 
@@ -30,24 +33,28 @@ export function Chat({ address, chainId }: ChatProps) {
     setLoading(true)
     setError('')
 
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage], address, chainId }),
-      })
-      const data = await response.json()
-      if (data.reply) {
-        const assistantMessage: Message = { role: 'assistant', content: data.reply }
-        setMessages(prev => [...prev, assistantMessage])
-      } else {
-        setError('No response from AI.')
+    chatMutation.mutate(
+      {
+        messages: [...messages, userMessage],
+        address,
+        chainId
+      },
+      {
+        onSuccess: (data) => {
+          if (data.reply) {
+            const assistantMessage: Message = { role: 'assistant', content: data.reply }
+            setMessages(prev => [...prev, assistantMessage])
+          } else {
+            setError('No response from AI.')
+          }
+          setLoading(false)
+        },
+        onError: (error) => {
+          setError('Error sending message. Please try again.')
+          setLoading(false)
+        }
       }
-    } catch (error) {
-      setError('Error sending message. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+    )
   }
 
   return (

@@ -5,56 +5,32 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Wallet, LogOut } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { TokenBalance } from '@/lib/balanceService'
+import { Wallet, LogOut, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
+import { useBalance } from '@/hooks/useBalance'
 import { WalletConnect } from './WalletConnect'
 
 export function Header() {
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
-  const [balances, setBalances] = useState<TokenBalance[]>([])
-  const [loading, setLoading] = useState(false)
   const [showWalletModal, setShowWalletModal] = useState(false)
 
-  const fetchBalances = async () => {
-    if (!address) return
-    setLoading(true)
-    try {
-      const response = await fetch('/api/balance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          address,
-          chainIds: [11155111, 7001] // Ethereum Sepolia and ZetaChain testnet
-        }),
-      })
+  const {
+    data: balanceData,
+    isLoading: loading,
+    error,
+    refetch
+  } = useBalance({
+    address,
+    chainIds: [11155111, 7001], // Ethereum Sepolia and ZetaChain testnet
+    enabled: isConnected && !!address
+  })
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch balances')
-      }
-
-      const data = await response.json()
-      setBalances(data.balances)
-    } catch (error) {
-      console.error('Error fetching balances:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (isConnected && address) {
-      fetchBalances()
-    }
-  }, [isConnected, address])
-
-  const totalUsdValue = balances.reduce((sum, token) => sum + (token.usdValue || 0), 0)
+  const balances = balanceData?.balances || []
+  const totalUsdValue = balanceData?.totalUsdValue || 0
 
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50 h-[70px]">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <h1 className="text-2xl font-bold mystical-text cursor-pointer" onClick={() => window.location.href = '/'}>
@@ -103,13 +79,36 @@ export function Header() {
 
                     {loading ? (
                       <p className="text-sm text-muted-foreground">Loading balances...</p>
+                    ) : error ? (
+                      <div className="space-y-2">
+                        <p className="text-sm text-red-500">Failed to load balances</p>
+                        <Button
+                          onClick={() => refetch()}
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                        >
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Retry
+                        </Button>
+                      </div>
                     ) : (
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">Total Value USD</span>
-                          <Badge variant="secondary" className="mystical-gradient text-white">
-                            ${totalUsdValue.toFixed(2)}
-                          </Badge>
+                          <span className="text-sm font-medium">Total Value</span>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="secondary" className="mystical-gradient text-white">
+                              ${totalUsdValue.toFixed(2)}
+                            </Badge>
+                            <Button
+                              onClick={() => refetch()}
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                            >
+                              <RefreshCw className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                         
                         <div className="space-y-2">
@@ -130,6 +129,9 @@ export function Header() {
                               </div>
                             </div>
                           ))}
+                          {balances.filter(token => parseFloat(token.balance) > 0).length === 0 && (
+                            <p className="text-sm text-muted-foreground">No tokens found</p>
+                          )}
                         </div>
                       </div>
                     )}

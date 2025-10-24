@@ -66,6 +66,8 @@
   --shadow-opacity: var(--shadow-opacity);
   --color-shadow-color: var(--shadow-color);
   --color-destructive-foreground: var(--destructive-foreground);
+  --header-height: 70px;
+  --hero-height: calc(100vh - 70px);
 }
 
 :root {
