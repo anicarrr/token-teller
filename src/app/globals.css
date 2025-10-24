@@ -187,4 +187,27 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+
+.mystical-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.mystical-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.chat-message-user {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.chat-message-ai {
+  background: hsl(var(--secondary));
+}
+
+.hero-bg {
+  background: radial-gradient(ellipse at center, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+}
 }
