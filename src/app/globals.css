@@ -251,4 +251,23 @@
 .fortune-button:hover::before {
   animation-duration: 1s;
 }
+
+/* Custom animations for mystical loader */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Mystical gradient colors */
+.text-gold-400 {
+  color: #fbbf24;
+}
 }

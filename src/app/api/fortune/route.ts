@@ -1,27 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
-import { BalanceService, TokenBalance } from '@/lib/balanceService'
+import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
+import { BalanceService, TokenBalance } from '@/lib/balanceService';
+import { ImageService } from '@/lib/imageService';
+import { SupabaseStorageService } from '@/lib/supabaseService';
 
 const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-})
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const { address, chainIds, birthDate } = await request.json()
+    const { address, chainIds, birthDate } = await request.json();
 
     if (!address || !chainIds) {
-      return NextResponse.json({ error: 'Address and chainIds are required' }, { status: 400 })
+      return NextResponse.json({ error: 'Address and chainIds are required' }, { status: 400 });
     }
 
     // Fetch balances using the service
-    const { balances, totalUsdValue } = await BalanceService.fetchBalances(address, chainIds)
+    const { balances, totalUsdValue } = await BalanceService.fetchBalances(address, chainIds);
 
     // Build prompt for OpenAI
     const tokenSummary = balances
-      .map((b: TokenBalance) => `${b.symbol} (${b.chainName}): ${parseFloat(b.balance).toFixed(4)} ($${b.usdValue.toFixed(2)})`)
-      .join(', ')
-    
+      .map(
+        (b: TokenBalance) => `${b.symbol} (${b.chainName}): ${parseFloat(b.balance).toFixed(4)} ($${b.usdValue.toFixed(2)})`
+      )
+      .join(', ');
+
     // Build birth date context if provided
     let birthDateContext = '';
     if (birthDate) {
@@ -31,17 +35,30 @@ export async function POST(request: NextRequest) {
       const day = birth.getDate();
       const hour = birth.getHours();
       const minute = birth.getMinutes();
-      
+
       // Calculate Chinese zodiac year
-      const chineseZodiacAnimals = ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
+      const chineseZodiacAnimals = [
+        'Rat',
+        'Ox',
+        'Tiger',
+        'Rabbit',
+        'Dragon',
+        'Snake',
+        'Horse',
+        'Goat',
+        'Monkey',
+        'Rooster',
+        'Dog',
+        'Pig'
+      ];
       const zodiacIndex = (year - 4) % 12;
       const zodiacAnimal = chineseZodiacAnimals[zodiacIndex];
-      
+
       // Calculate Five Elements cycle
       const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
       const elementIndex = Math.floor(((year - 4) % 60) / 12);
       const element = elements[elementIndex];
-      
+
       birthDateContext = `
       Birth Information:
       - Date: ${birth.toDateString()}
@@ -59,34 +76,64 @@ export async function POST(request: NextRequest) {
       
       ${birthDateContext}
 
-      ${birthDate ?
-        'Use the birth date information to provide deeper BaZi insights, connecting their zodiac animal and birth element to their crypto portfolio. Explain how their birth chart influences their financial fortune and trading luck.' :
-        'Generate a general BaZi-style fortune based on their portfolio.'
+      ${
+        birthDate
+          ? 'Use the birth date information to provide deeper BaZi insights, connecting their zodiac animal and birth element to their crypto portfolio. Explain how their birth chart influences their financial fortune and trading luck.'
+          : 'Generate a general BaZi-style fortune based on their portfolio.'
       }
 
       Provide a creative, positive, and insightful fortune, including advice on their crypto future. Keep it engaging and metaphysics-inspired.
-    `
+    `;
 
     // Call OpenAI
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 300,
-    })
+      max_tokens: 300
+    });
 
-    const fortune = response.choices[0]?.message?.content || 'No fortune generated.'
+    const fortune = response.choices[0]?.message?.content || 'No fortune generated.';
 
-    return NextResponse.json({ fortune, balances, totalUsdValue })
+    // Generate image based on the fortune prompt
+    let imageUrl: string | null = null;
+    try {
+      // Create a visual prompt based on the fortune content
+      const imagePrompt = `Create a mystical, ethereal artwork representing a BaZi fortune reading. The image should include: cosmic elements, ancient Chinese symbols, flowing energy patterns, celestial bodies, and mystical colors like deep purples, golds, and blues. The overall mood should be spiritual, wise, and fortune-telling themed. Style: digital art, mystical, ethereal, cosmic. Use this as content for the image: ${birthDateContext}`;
+
+      console.log('Generating image with prompt:', imagePrompt);
+
+      // Generate image using Google Imagen
+      const imageBase64 = await ImageService.generateImage(imagePrompt);
+
+      // Upload to Supabase
+      const fileName = SupabaseStorageService.generateFileName('fortune-reading');
+      imageUrl = await SupabaseStorageService.uploadImage(imageBase64, fileName);
+
+      console.log('Image generated and uploaded successfully:', imageUrl);
+    } catch (imageError) {
+      console.error('Failed to generate or upload image:', imageError);
+      // Continue without image - don't fail the entire request
+    }
+
+    return NextResponse.json({
+      fortune,
+      balances,
+      totalUsdValue,
+      imageUrl
+    });
   } catch (error) {
-    console.error('Error generating fortune:', error)
-    
+    console.error('Error generating fortune:', error);
+
     // Handle specific error types
     if (error instanceof Error && error.message === 'Invalid address format') {
-      return NextResponse.json({
-        error: 'Invalid address format'
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: 'Invalid address format'
+        },
+        { status: 400 }
+      );
     }
-    
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

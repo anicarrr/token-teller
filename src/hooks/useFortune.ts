@@ -12,6 +12,7 @@ interface FortuneResponse {
   fortune: string
   balances: TokenBalance[]
   totalUsdValue: number
+  imageUrl?: string | null
 }
 
 export function useFortune({ address, chainIds, birthDate, enabled = true }: UseFortuneParams) {
