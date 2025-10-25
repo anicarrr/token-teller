@@ -30,6 +30,11 @@ export function Chat({ fortune }: ChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -37,7 +42,6 @@ export function Chat({ fortune }: ChatProps) {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setError('');
-    scrollToBottom();
     
     chatMutation(
       {
