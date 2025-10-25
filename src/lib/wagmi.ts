@@ -1,3 +1,5 @@
+'use client';
+
 import { http, createConfig } from 'wagmi'
 import { sepolia } from 'viem/chains'
 import { defineChain } from 'viem'
