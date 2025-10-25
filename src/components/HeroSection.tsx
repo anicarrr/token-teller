@@ -6,6 +6,7 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { GalaxyParticles } from './GalaxyParticles';
 
 export function HeroSection() {
   const { isConnected } = useAccount();
@@ -27,8 +28,9 @@ export function HeroSection() {
   }, [isConnected, router]);
 
   return (
-    <div className="min-h-(--hero-height) flex items-center justify-center hero-bg">
-      <div className="container mx-auto px-4 text-center">
+    <div className="min-h-(--hero-height) flex items-center justify-center hero-bg relative overflow-hidden">
+      <GalaxyParticles />
+      <div className="container mx-auto px-4 text-center relative z-10">
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-6xl md:text-8xl font-bold mystical-text leading-tight">
             Unveil Your
