@@ -124,20 +124,22 @@ export default function FortunePage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="space-y-8">
-          {/* Birth Date Form */}
-          {showBirthDateForm ? (
-            <BirthDateForm
-              onSubmit={handleBirthDateSubmit}
-              onBack={birthDate ? handleBackFromForm : undefined}
-              showBackButton={!!birthDate}
-              initialBirthDate={birthDate}
-              isLoading={fortuneLoading}
-            />
-          ) : (
-            <>
-              {/* Fortune Card */}
+      {/* Birth Date Form - Full Screen */}
+      {showBirthDateForm ? (
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <BirthDateForm
+            onSubmit={handleBirthDateSubmit}
+            onBack={birthDate ? handleBackFromForm : undefined}
+            showBackButton={!!birthDate}
+            initialBirthDate={birthDate}
+            isLoading={fortuneLoading}
+          />
+        </div>
+      ) : (
+        <>
+          {/* Loading or Error State - Full Screen */}
+          {(fortuneLoading || fortuneError || !fortune) ? (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
               <Card className="border-primary/20">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
@@ -170,36 +172,79 @@ export default function FortunePage() {
                         Try Again
                       </Button>
                     </div>
-                  ) : fortune ? (
-                    <div className="prose prose-invert max-w-none">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <div className="mb-6 flex justify-center">
-                            <MysticalImageLoader
-                              imageUrl={imageUrl}
-                              alt="Fortune Reading Visualization"
-                              className="max-w-md w-full h-auto"
-                            />
-                          </div>
-                          <p className="text-lg leading-relaxed">{fortune}</p>
-                        </div>
-                        <Button onClick={() => refetchFortune()} variant="ghost" size="sm" className="ml-4">
-                          <RefreshCw className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
                   ) : null}
                 </CardContent>
               </Card>
+            </div>
+          ) : (
+            /* Split Screen Layout - When Fortune is Available */
+            <div className="flex h-[var(--hero-height)] split-screen-expand">
+              {/* Left Panel - Fortune Display */}
+              <div className="flex-1 overflow-y-auto bg-background subtle-scrollbar split-left-expand">
+                <div className="p-6 h-full">
+                  <div className="max-w-2xl mx-auto">
+                    {/* Fortune Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <h1 className="text-2xl font-bold">Your BaZi Fortune</h1>
+                      </div>
+                      <Button onClick={handleChangeBirthDate} variant="ghost" size="sm" className="text-xs">
+                        Change Birth Date
+                      </Button>
+                    </div>
+                    
+                    {birthDate && (
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Birth Date: {birthDate.toLocaleDateString()}
+                        {birthDate.getHours() !== 12 && ` at ${birthDate.toLocaleTimeString()}`}
+                      </p>
+                    )}
 
-              {/* Chat Interface */}
-              {fortune && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Ask About Your Fortune</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="h-96 overflow-y-auto border rounded-lg p-4 space-y-4">
+                    {/* Fortune Content */}
+                    <div className="space-y-6">
+                      <div className="flex justify-center">
+                        <MysticalImageLoader
+                          imageUrl={imageUrl}
+                          alt="Fortune Reading Visualization"
+                          className="max-w-md w-full h-auto"
+                        />
+                      </div>
+                      
+                      <div className="prose prose-invert max-w-none">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="text-lg leading-relaxed">{fortune}</p>
+                          </div>
+                          <Button onClick={() => refetchFortune()} variant="ghost" size="sm" className="ml-4">
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Panel - Chat Interface */}
+              <div className="flex-1 overflow-y-auto bg-muted/30 border-l border-border subtle-scrollbar split-right-expand">
+                <div className="p-6 h-full flex flex-col">
+                  <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+                    {/* Chat Header */}
+                    <div className="mb-6">
+                      <h2 className="text-xl font-semibold">Ask About Your Fortune</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Have questions about your reading? Chat with our AI oracle.
+                      </p>
+                    </div>
+
+                    {/* Chat Messages */}
+                    <div className="flex-1 overflow-y-auto border rounded-lg p-4 space-y-4 bg-background/50 backdrop-blur-sm mb-4 custom-scrollbar">
+                      {messages.length === 0 && (
+                        <div className="text-center text-muted-foreground py-8">
+                          <p>Start a conversation about your fortune...</p>
+                        </div>
+                      )}
                       {messages.map((msg, index) => (
                         <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                           <div
@@ -220,8 +265,10 @@ export default function FortunePage() {
                       )}
                     </div>
 
-                    {chatError && <p className="text-red-500 text-center text-sm">{chatError}</p>}
+                    {/* Chat Error */}
+                    {chatError && <p className="text-red-500 text-center text-sm mb-4">{chatError}</p>}
 
+                    {/* Chat Input */}
                     <div className="flex space-x-2">
                       <Input
                         value={input}
@@ -238,13 +285,13 @@ export default function FortunePage() {
                         <Send className="h-4 w-4" />
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-            </>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -270,4 +270,187 @@
 .text-gold-400 {
   color: #fbbf24;
 }
+
+/* Custom scrollbar styling - very subtle like Claude */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.15);
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.25);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent;
+}
+
+/* Custom scrollbar for specific containers */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.15);
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.25);
+}
+
+/* Even more subtle scrollbar for main panels */
+.subtle-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.08) transparent;
+}
+
+.subtle-scrollbar::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.subtle-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.subtle-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.08);
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.subtle-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.15);
+}
+
+/* Split screen animation */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes expandFromCenter {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: center;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: center;
+  }
+}
+
+@keyframes expandLeftPanel {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@keyframes expandRightPanel {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+}
+
+.split-screen-enter {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.split-left-enter {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.split-right-enter {
+  animation: slideInFromRight 0.5s ease-out 0.1s both;
+}
+
+/* Alternative expanding animation */
+.split-screen-expand {
+  animation: expandFromCenter 0.7s ease-out;
+}
+
+.split-left-expand {
+  animation: expandLeftPanel 0.6s ease-out;
+}
+
+.split-right-expand {
+  animation: expandRightPanel 0.6s ease-out 0.15s both;
+}
+
+/* Smooth transitions for layout changes */
+.layout-transition {
+  transition: all 0.3s ease-out;
+}
 }
