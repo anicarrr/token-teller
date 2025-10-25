@@ -222,6 +222,7 @@ Due to time constrain I pulled off the modest MVP ever, persistation and best sy
 | Session | By wallet widget | By wallet widget + custom auto-singup-in with wallet address + webhooks |
 | Wallet balance | Hitting CoinGecko api always for USD value comparison | Redis + TTL logic + multiple currency-crypto API |
 | UI & UX | basic  | tailored theme + logo/s |
+| Chat | accumulative context feeding on every request (mgs + fornute)  | Feeding from DB + Redis server-side |
 | NFT & media sharing | -  | On fortune result and images generated  |
 
 ---
