@@ -13,6 +13,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Messages are required' }, { status: 400 });
     }
 
+    const maxCompletionTokens = 300;
+
     // Build system prompt with fortune context
     const systemPrompt = `
       You are a BaZi fortune teller specializing in crypto portfolios. Respond in a mystical, insightful style based on the user's fortune reading.
@@ -20,6 +22,10 @@ export async function POST(request: NextRequest) {
       User's Fortune Reading: ${fortune}
       
       Use the fortune reading as context to provide personalized advice about their crypto future. Reference elements from their fortune when giving guidance and maintain the mystical, insightful tone throughout the conversation.
+
+      Try not to exceed the max completion tokens.
+
+      Max Completion Tokens: ${maxCompletionTokens}
     `;
 
     const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];
@@ -28,7 +34,7 @@ export async function POST(request: NextRequest) {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: fullMessages,
-      max_completion_tokens: 300
+      max_completion_tokens: maxCompletionTokens
     });
 
     const reply = response.choices[0]?.message?.content || 'No response generated.';

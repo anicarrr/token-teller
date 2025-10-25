@@ -75,7 +75,7 @@ export function Chat({ fortune }: ChatProps) {
               className="flex-1 overflow-y-auto border rounded-lg p-4 space-y-4 bg-background/50 backdrop-blur-sm h-full custom-scrollbar"
             >
               {messages.length === 0 && (
-                <div className="text-center text-muted-foreground py-8 h-full">
+                <div className="text-center text-muted-foreground py-8 h-[90%]">
                   <p>Start a conversation about your fortune...</p>
                 </div>
               )}
