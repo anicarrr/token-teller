@@ -272,7 +272,7 @@
 }
 
 /* Custom scrollbar styling - very subtle like Claude */
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
@@ -293,16 +293,16 @@
 
 ::-webkit-scrollbar-corner {
   background: transparent;
-}
+} */
 
 /* Firefox scrollbar styling */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent;
+  scrollbar-width: thin !important;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent !important;
 }
 
 /* Custom scrollbar for specific containers */
-.custom-scrollbar {
+/* .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent;
 }
@@ -324,10 +324,10 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.25);
-}
+} */
 
 /* Even more subtle scrollbar for main panels */
-.subtle-scrollbar {
+/* .subtle-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--muted-foreground) / 0.08) transparent;
 }
@@ -349,7 +349,7 @@
 
 .subtle-scrollbar::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.15);
-}
+} */
 
 /* Split screen animation */
 @keyframes slideInFromLeft {

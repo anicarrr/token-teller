@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Wallet, LogOut, RefreshCw, ChevronDown, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useBalance } from '@/hooks/useBalance';
-import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { ChainIdList } from '@/enums';
 import { useAppContext } from '@/contexts/AppContext';
 
@@ -20,9 +20,10 @@ const CHAIN_OPTIONS = [
 export function Header() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const { handleLogOut } = useDynamicContext();
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [showChainDropdown, setShowChainDropdown] = useState(false);
-  const { selectedChainId, setSelectedChainId } = useAppContext();
+  const { selectedChainId, setSelectedChainId, setSelectedChainName } = useAppContext();
 
   const {
     data: balanceData,
@@ -48,6 +49,7 @@ export function Header() {
 
   const handleChainSelect = (chainId: number) => {
     setSelectedChainId(chainId);
+    setSelectedChainName(selectedChain?.name || '');
     setShowChainDropdown(false);
   };
 
@@ -178,7 +180,15 @@ export function Header() {
                       </div>
                     )}
 
-                    <Button onClick={() => disconnect()} variant="destructive" size="sm" className="w-full">
+                    <Button
+                      onClick={() => {
+                        handleLogOut();
+                        disconnect();
+                      }}
+                      variant="destructive"
+                      size="sm"
+                      className="w-full"
+                    >
                       <LogOut className="h-4 w-4 mr-2" />
                       Disconnect
                     </Button>
@@ -186,8 +196,6 @@ export function Header() {
                 </DialogContent>
               </Dialog>
               <Button variant="secondary">{selectedChain?.name}</Button>
-              
-
             </>
           ) : (
             <DynamicWidget

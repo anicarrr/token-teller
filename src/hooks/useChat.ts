@@ -7,8 +7,7 @@ interface ChatMessage {
 
 interface ChatMutationParams {
   messages: ChatMessage[]
-  address: string
-  chainId: number
+  fortune: string
 }
 
 interface ChatResponse {
@@ -17,10 +16,7 @@ interface ChatResponse {
 
 export function useChat() {
   return useMutation<ChatResponse, Error, ChatMutationParams>({
-    mutationFn: async ({ messages, address, chainId }) => {
-      if (!address) {
-        throw new Error('Address is required')
-      }
+    mutationFn: async ({ messages, fortune }) => {
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -29,8 +25,7 @@ export function useChat() {
         },
         body: JSON.stringify({
           messages,
-          address,
-          chainId,
+          fortune,
         }),
       })
 

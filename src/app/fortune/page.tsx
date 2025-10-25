@@ -6,27 +6,21 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Loader2, Send, Sparkles, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw } from 'lucide-react';
 import { useFortune } from '@/hooks/useFortune';
-import { useChat } from '@/hooks/useChat';
 import { BirthDateForm } from '@/components/BirthDateForm';
 import { MysticalImageLoader } from '@/components/MysticalImageLoader';
+import { TypewriterText } from '@/components/TypewriterText';
+import { RotatingLoadingText } from '@/components/RotatingLoadingText';
 import { useAppContext } from '@/contexts/AppContext';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { Chat } from '@/components/Chat';
 
 export default function FortunePage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const router = useRouter();
-  const { selectedChainId } = useAppContext();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [chatError, setChatError] = useState<string>('');
+  const { selectedChainId, selectedChainName } = useAppContext();
+
   const [birthDate, setBirthDate] = useState<Date | null>(() => {
     if (typeof window !== 'undefined') {
       const storedBirthDate = localStorage.getItem('birthDate');
@@ -46,15 +40,14 @@ export default function FortunePage() {
     data: fortuneData,
     isLoading: fortuneLoading,
     error: fortuneError,
-    refetch: refetchFortune
+    refetch: refetchFortune,
+    isRefetching: fortuneIsRefetching
   } = useFortune({
     address,
     chainIds: [selectedChainId],
     birthDate,
     enabled: isConnected && !!address && !!chainId && !!birthDate
   });
-
-  const { mutate: sendMessageToAI, isPending: isSendingMessageToAI } = useChat();
 
   useEffect(() => {
     if (!isConnected) {
@@ -78,39 +71,6 @@ export default function FortunePage() {
 
   const handleBackFromForm = () => {
     setShowBirthDateForm(false);
-  };
-
-  const sendMessage = async () => {
-    if (!input.trim() || !address) return;
-
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setChatError('');
-
-    sendMessageToAI(
-      {
-        messages: [...messages, userMessage],
-        address,
-        chainId
-      },
-      {
-        onSuccess: (data) => {
-          if (data.reply) {
-            const assistantMessage: Message = {
-              role: 'assistant',
-              content: data.reply
-            };
-            setMessages((prev) => [...prev, assistantMessage]);
-          } else {
-            setChatError('No response from AI.');
-          }
-        },
-        onError: () => {
-          setChatError('Error sending message. Please try again.');
-        }
-      }
-    );
   };
 
   const fortune = fortuneData?.fortune;
@@ -138,7 +98,7 @@ export default function FortunePage() {
       ) : (
         <>
           {/* Loading or Error State - Full Screen */}
-          {(fortuneLoading || fortuneError || !fortune) ? (
+          {fortuneLoading || fortuneError || !fortune ? (
             <div className="container mx-auto px-4 py-8 max-w-4xl">
               <Card className="border-primary/20">
                 <CardHeader>
@@ -157,19 +117,26 @@ export default function FortunePage() {
                       {birthDate.getHours() !== 12 && ` at ${birthDate.toLocaleTimeString()}`}
                     </p>
                   )}
+                  {selectedChainName && <p className="text-sm text-muted-foreground">Chain: {selectedChainName}</p>}
                 </CardHeader>
                 <CardContent>
                   {fortuneLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      <span className="ml-2">Consulting the cosmic forces...</span>
+                      <span className="ml-2">
+                        <RotatingLoadingText />
+                      </span>
                     </div>
                   ) : fortuneError ? (
                     <div className="text-center py-8">
                       <p className="text-muted-foreground mb-4">Failed to generate your fortune.</p>
-                      <Button onClick={() => refetchFortune()} className="mystical-gradient text-white">
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Try Again
+                      <Button
+                        onClick={() => refetchFortune()}
+                        disabled={fortuneLoading}
+                        className="mystical-gradient text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <RefreshCw className={`h-4 w-4 mr-2 ${fortuneIsRefetching ? 'animate-spin' : ''}`} />
+                        {fortuneIsRefetching ? 'Retrying...' : 'Try Again'}
                       </Button>
                     </div>
                   ) : null}
@@ -182,7 +149,7 @@ export default function FortunePage() {
               {/* Left Panel - Fortune Display */}
               <div className="flex-1 overflow-y-auto bg-background subtle-scrollbar split-left-expand">
                 <div className="p-6 h-full">
-                  <div className="max-w-2xl mx-auto">
+                  <div className="max-w-2xl mx-auto pb-8">
                     {/* Fortune Header */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-2">
@@ -193,7 +160,7 @@ export default function FortunePage() {
                         Change Birth Date
                       </Button>
                     </div>
-                    
+
                     {birthDate && (
                       <p className="text-sm text-muted-foreground mb-6">
                         Birth Date: {birthDate.toLocaleDateString()}
@@ -210,14 +177,21 @@ export default function FortunePage() {
                           className="max-w-md w-full h-auto"
                         />
                       </div>
-                      
+
                       <div className="prose prose-invert max-w-none">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <p className="text-lg leading-relaxed">{fortune}</p>
+                            <p className="text-lg leading-relaxed">
+                              <TypewriterText text={fortune} speed={50} className="text-lg leading-relaxed" />
+                            </p>
                           </div>
-                          <Button onClick={() => refetchFortune()} variant="ghost" size="sm" className="ml-4">
-                            <RefreshCw className="h-4 w-4" />
+
+                          <Button
+                            onClick={() => refetchFortune()}
+                            disabled={fortuneIsRefetching}
+                            className="mystical-gradient cursor-pointer text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <RefreshCw className={`h-4 w-4 ${fortuneIsRefetching ? 'animate-spin' : ''}`} />
                           </Button>
                         </div>
                       </div>
@@ -229,63 +203,7 @@ export default function FortunePage() {
               {/* Right Panel - Chat Interface */}
               <div className="flex-1 overflow-y-auto bg-muted/30 border-l border-border subtle-scrollbar split-right-expand">
                 <div className="p-6 h-full flex flex-col">
-                  <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
-                    {/* Chat Header */}
-                    <div className="mb-6">
-                      <h2 className="text-xl font-semibold">Ask About Your Fortune</h2>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Have questions about your reading? Chat with our AI oracle.
-                      </p>
-                    </div>
-
-                    {/* Chat Messages */}
-                    <div className="flex-1 overflow-y-auto border rounded-lg p-4 space-y-4 bg-background/50 backdrop-blur-sm mb-4 custom-scrollbar">
-                      {messages.length === 0 && (
-                        <div className="text-center text-muted-foreground py-8">
-                          <p>Start a conversation about your fortune...</p>
-                        </div>
-                      )}
-                      {messages.map((msg, index) => (
-                        <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div
-                            className={`max-w-[80%] p-3 rounded-lg ${
-                              msg.role === 'user' ? 'chat-message-user text-white' : 'chat-message-ai'
-                            }`}
-                          >
-                            <p className="text-sm">{msg.content}</p>
-                          </div>
-                        </div>
-                      ))}
-                      {isSendingMessageToAI && (
-                        <div className="flex justify-start">
-                          <div className="chat-message-ai p-3 rounded-lg">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Chat Error */}
-                    {chatError && <p className="text-red-500 text-center text-sm mb-4">{chatError}</p>}
-
-                    {/* Chat Input */}
-                    <div className="flex space-x-2">
-                      <Input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask a question about your fortune..."
-                        onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-                        className="flex-1"
-                      />
-                      <Button
-                        onClick={sendMessage}
-                        disabled={isSendingMessageToAI || !input.trim()}
-                        className="mystical-gradient text-white"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                  <Chat fortune={fortune || ''} />
                 </div>
               </div>
             </div>

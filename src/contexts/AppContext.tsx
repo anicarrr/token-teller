@@ -1,11 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ChainIdList } from '@/enums';
+import { ChainIdList, ChainNameList } from '@/enums';
 
 interface AppContextType {
   selectedChainId: number;
   setSelectedChainId: (chainId: number) => void;
+  selectedChainName: string;
+  setSelectedChainName: (chainName: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -16,10 +18,12 @@ interface AppProviderProps {
 
 export function AppProvider({ children }: AppProviderProps) {
   const [selectedChainId, setSelectedChainId] = useState<number>(ChainIdList.EthereumSepolia);
-
+  const [selectedChainName, setSelectedChainName] = useState<string>(ChainNameList.EthereumSepolia);
   const value = {
     selectedChainId,
     setSelectedChainId,
+    selectedChainName,
+    setSelectedChainName
   };
 
   return (

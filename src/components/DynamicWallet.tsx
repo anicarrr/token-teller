@@ -1,4 +1,4 @@
-import { DynamicContextProvider, DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
 
 import { DynamicWagmiConnector } from '@dynamic-labs/wagmi-connector';
 import { WagmiProvider } from 'wagmi';

@@ -34,6 +34,5 @@ export function useBalance({ address, chainIds, enabled = true }: UseBalancePara
     },
     enabled: enabled && !!address && chainIds.length > 0,
     staleTime: 30000, // 30 seconds
-    refetchInterval: 60000, // Refetch every minute
   })
 }

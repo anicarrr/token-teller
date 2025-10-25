@@ -82,14 +82,14 @@ export async function POST(request: NextRequest) {
           : 'Generate a general BaZi-style fortune based on their portfolio.'
       }
 
-      Provide a creative, positive, and insightful fortune, including advice on their crypto future. Keep it engaging and metaphysics-inspired.
+      Provide a creative, positive, and insightful fortune, including advice on their crypto future. Keep it engaging and metaphysics-inspired. Don't sign the response, don't add nothing like [your name] or [your signature] or anything like that at the end of the response.
     `;
 
     // Call OpenAI
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 300
+      max_completion_tokens: 500
     });
 
     const fortune = response.choices[0]?.message?.content || 'No fortune generated.';
@@ -117,8 +117,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       fortune,
-      balances,
-      totalUsdValue,
       imageUrl
     });
   } catch (error) {
