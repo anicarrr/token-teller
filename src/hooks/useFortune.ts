@@ -4,6 +4,7 @@ import { TokenBalance } from '@/lib/balanceService'
 interface UseFortuneParams {
   address: string | undefined
   chainIds: number[]
+  birthDate?: Date | null
   enabled?: boolean
 }
 
@@ -13,9 +14,9 @@ interface FortuneResponse {
   totalUsdValue: number
 }
 
-export function useFortune({ address, chainIds, enabled = true }: UseFortuneParams) {
+export function useFortune({ address, chainIds, birthDate, enabled = true }: UseFortuneParams) {
   return useQuery<FortuneResponse>({
-    queryKey: ['fortune', address, chainIds],
+    queryKey: ['fortune', address, chainIds, birthDate?.toISOString()],
     queryFn: async () => {
       if (!address) {
         throw new Error('Address is required')
@@ -29,6 +30,7 @@ export function useFortune({ address, chainIds, enabled = true }: UseFortunePara
         body: JSON.stringify({
           address,
           chainIds,
+          birthDate: birthDate?.toISOString(),
         }),
       })
 

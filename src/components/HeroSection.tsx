@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { WalletConnect } from './WalletConnect'
 import { useState } from 'react'
+import { Sparkles } from 'lucide-react'
 
 export function HeroSection() {
   const { isConnected } = useAccount()
@@ -43,9 +44,10 @@ export function HeroSection() {
               <Button 
                 onClick={handleGetFortune}
                 size="lg" 
-                className="mystical-gradient text-white text-lg px-8 py-6 rounded-full hover:scale-105 transition-transform duration-200"
+                className="mystical-gradient fortune-button cursor-pointer text-white text-lg px-8 py-6 rounded-full hover:scale-105 transition-transform duration-200"
               >
-                Tell me my fortune!
+                <Sparkles className="h-4 w-4" />
+                <span>Tell me my fortune!</span>
               </Button>
             )}
           </div>
