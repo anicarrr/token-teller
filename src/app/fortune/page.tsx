@@ -144,25 +144,90 @@ export default function FortunePage() {
               </Card>
             </div>
           ) : (
-            /* Split Screen Layout - When Fortune is Available */
-            <div className="flex h-[var(--hero-height)] split-screen-expand">
-              {/* Left Panel - Fortune Display */}
-              <div className="flex-1 overflow-y-auto bg-background subtle-scrollbar split-left-expand">
-                <div className="p-6 h-full">
-                  <div className="max-w-2xl mx-auto pb-8">
+            /* Responsive Layout - When Fortune is Available */
+            <>
+              {/* Desktop: Split Screen Layout */}
+              <div className="hidden lg:flex h-[var(--hero-height)] split-screen-expand">
+                {/* Left Panel - Fortune Display */}
+                <div className="flex-1 overflow-y-auto bg-background subtle-scrollbar split-left-expand">
+                  <div className="p-6 h-full">
+                    <div className="max-w-2xl mx-auto pb-8">
+                      {/* Fortune Header */}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <h1 className="text-2xl font-bold">Your BaZi Fortune</h1>
+                        </div>
+                        <Button onClick={handleChangeBirthDate} variant="ghost" size="sm" className="text-xs">
+                          Change Birth Date
+                        </Button>
+                      </div>
+
+                      {birthDate && (
+                        <p className="text-sm text-muted-foreground mb-6">
+                          Birth Date: {birthDate.toLocaleDateString()}
+                          {birthDate.getHours() !== 12 && ` at ${birthDate.toLocaleTimeString()}`}
+                        </p>
+                      )}
+
+                      {/* Fortune Content */}
+                      <div className="space-y-6">
+                        <div className="flex justify-center">
+                          <MysticalImageLoader
+                            imageUrl={imageUrl}
+                            alt="Fortune Reading Visualization"
+                            className="max-w-md w-full h-auto"
+                          />
+                        </div>
+
+                        <div className="prose prose-invert max-w-none">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="text-lg leading-relaxed">
+                                <TypewriterText text={fortune} speed={50} className="text-lg leading-relaxed" />
+                              </p>
+                            </div>
+
+                            <Button
+                              onClick={() => refetchFortune()}
+                              disabled={fortuneIsRefetching}
+                              className="mystical-gradient cursor-pointer text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <RefreshCw className={`h-4 w-4 ${fortuneIsRefetching ? 'animate-spin' : ''}`} />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Panel - Chat Interface */}
+                <div className="flex-1 overflow-y-auto bg-muted/30 border-l border-border subtle-scrollbar split-right-expand">
+                  <div className="p-6 h-full flex flex-col">
+                    <Chat fortune={fortune || ''} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile: Single Panel Stacked Layout */}
+              <div className="lg:hidden min-h-[var(--hero-height)] overflow-y-auto">
+                <div className="container mx-auto px-4 py-6 max-w-4xl space-y-8">
+                  {/* Fortune Section */}
+                  <div className="space-y-6">
                     {/* Fortune Header */}
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex items-center space-x-2">
                         <Sparkles className="h-5 w-5 text-primary" />
-                        <h1 className="text-2xl font-bold">Your BaZi Fortune</h1>
+                        <h1 className="text-xl sm:text-2xl font-bold">Your BaZi Fortune</h1>
                       </div>
-                      <Button onClick={handleChangeBirthDate} variant="ghost" size="sm" className="text-xs">
+                      <Button onClick={handleChangeBirthDate} variant="ghost" size="sm" className="text-xs self-start sm:self-auto">
                         Change Birth Date
                       </Button>
                     </div>
 
                     {birthDate && (
-                      <p className="text-sm text-muted-foreground mb-6">
+                      <p className="text-sm text-muted-foreground">
                         Birth Date: {birthDate.toLocaleDateString()}
                         {birthDate.getHours() !== 12 && ` at ${birthDate.toLocaleTimeString()}`}
                       </p>
@@ -174,39 +239,40 @@ export default function FortunePage() {
                         <MysticalImageLoader
                           imageUrl={imageUrl}
                           alt="Fortune Reading Visualization"
-                          className="max-w-md w-full h-auto"
+                          className="max-w-sm w-full h-auto"
                         />
                       </div>
 
                       <div className="prose prose-invert max-w-none">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="text-lg leading-relaxed">
-                              <TypewriterText text={fortune} speed={50} className="text-lg leading-relaxed" />
-                            </p>
+                        <div className="space-y-4">
+                          <div className="text-base sm:text-lg leading-relaxed">
+                            <TypewriterText text={fortune} speed={50} className="text-base sm:text-lg leading-relaxed" />
                           </div>
 
-                          <Button
-                            onClick={() => refetchFortune()}
-                            disabled={fortuneIsRefetching}
-                            className="mystical-gradient cursor-pointer text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <RefreshCw className={`h-4 w-4 ${fortuneIsRefetching ? 'animate-spin' : ''}`} />
-                          </Button>
+                          <div className="flex justify-center">
+                            <Button
+                              onClick={() => refetchFortune()}
+                              disabled={fortuneIsRefetching}
+                              className="mystical-gradient cursor-pointer text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <RefreshCw className={`h-4 w-4 mr-2 ${fortuneIsRefetching ? 'animate-spin' : ''}`} />
+                              {fortuneIsRefetching ? 'Generating...' : 'New Fortune'}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Right Panel - Chat Interface */}
-              <div className="flex-1 overflow-y-auto bg-muted/30 border-l border-border subtle-scrollbar split-right-expand">
-                <div className="p-6 h-full flex flex-col">
-                  <Chat fortune={fortune || ''} />
+                  {/* Chat Section */}
+                  <div className="border-t border-border pt-8">
+                    <div className="min-h-[400px] max-h-[600px] overflow-hidden">
+                      <Chat fortune={fortune || ''} />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </>
       )}
