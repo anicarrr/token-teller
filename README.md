@@ -1,119 +1,230 @@
-# Token Teller Fortune Prototype
+# 🔮 Token Teller
 
-An interactive web application that connects to users' crypto wallets, retrieves token balances, and uses AI to generate personalized "fortunes" based on BaZi (Chinese Four Pillars of Destiny). Users can interact with the app, asking follow-up questions about their fortunes or holdings, with AI providing dynamic, metaphysics-inspired responses.
+**Unveil Your Crypto Destiny with Ancient Wisdom**
 
-## Features
+Token Teller is a mystical web application that combines traditional Chinese BaZi (Four Pillars of Destiny) fortune telling with modern cryptocurrency portfolio analysis. Connect your wallet, share your birth date, and discover what the cosmic forces reveal about your digital fortune.
 
-- **Wallet Integration**: Connect to MetaMask or WalletConnect for Ethereum and ZetaChain.
-- **Multi-Chain Support**: Supports Ethereum mainnet and ZetaChain testnet.
-- **Token Balance Fetching**: Retrieves native and ERC20 token balances using ethers.js.
-- **AI-Powered Fortunes**: Generates personalized BaZi-inspired fortunes using OpenAI API.
-- **Interactive Chat**: Ask follow-up questions with conversation history maintained.
-- **Responsive Design**: Mobile-friendly UI using Tailwind CSS and shadcn/ui components.
-- **Loading States & Error Handling**: User-friendly feedback for all operations.
+## ✨ Features
 
-## Tech Stack
+### 🌟 Core Functionality
+- **Multi-Chain Wallet Integration**: Support for Ethereum Sepolia and ZetaChain Testnet
+- **BaZi Fortune Reading**: Personalized fortune telling based on Chinese astrology and your crypto portfolio
+- **AI-Powered Insights**: GPT-powered fortune generation with mystical imagery
+- **Interactive Chat**: Ask questions about your fortune with an AI oracle
+- **Real-Time Portfolio Analysis**: Fetch and analyze token balances with USD valuations
 
-- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui
-- **Blockchain**: Wagmi, Viem, Ethers.js
-- **AI**: OpenAI API (GPT-3.5-turbo)
-- **Price Data**: CoinGecko API
+### 🎨 User Experience
+- **Mystical UI**: Cosmic-themed interface with galaxy particles and ethereal animations
+- **Responsive Design**: Optimized for desktop and mobile devices
+- **Typewriter Effects**: Engaging text animations for fortune reveals
+- **Dynamic Image Generation**: AI-generated mystical artwork for each reading
 
-## Project Structure
+### 🔗 Blockchain Integration
+- **Dynamic Wallet Connection**: Seamless wallet integration with multiple providers
+- **Multi-Chain Support**: Ethereum Sepolia and ZetaChain Testnet networks
+- **Token Balance Fetching**: Real-time portfolio analysis with USD pricing
+- **Secure Transactions**: Built on wagmi and viem for reliable blockchain interactions
 
-```
-src/
-├── app/
-│   ├── api/
-│   │   ├── fortune/route.ts    # API for generating fortunes
-│   │   └── chat/route.ts       # API for chat interactions
-│   ├── layout.tsx              # Root layout with WagmiProvider
-│   ├── page.tsx                # Main page with WalletConnect
-│   └── globals.css             # Global styles
-├── components/
-│   ├── ui/                     # shadcn/ui components (Button, Input, Card)
-│   ├── WalletConnect.tsx       # Wallet connection and dashboard
-│   └── Chat.tsx                # Chat interface
-├── lib/
-│   ├── wagmi.ts                # Wagmi configuration for chains
-│   ├── tokenList.ts            # Curated token list for each chain
-│   └── tokenFetcher.ts         # Service to fetch token balances
-└── .env.local                  # Environment variables (API keys, RPC URLs)
-```
-
-## Decisions & Trade-offs
-
-- **MVP Focus**: Prioritized core features (wallet connect, balance fetch, fortune generation, chat) over advanced features like real-time updates or extensive token lists.
-- **Chain Selection**: Chose Ethereum and ZetaChain for multi-chain support as per requirements. Used testnet for ZetaChain to align with provided faucets.
-- **AI Integration**: Used OpenAI for simplicity and reliability. Prompt engineering focused on BaZi theme for creative fortunes.
-- **UI Framework**: Leveraged shadcn/ui for consistent, accessible components and rapid prototyping.
-- **Error Handling**: Added basic error states but kept it simple for MVP; could be expanded with retries or more detailed messages.
-- **Price API**: Integrated CoinGecko for USD values to enhance UX, despite potential rate limits.
-- **Security**: API keys are environment variables; no sensitive data exposed in client-side code.
-
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- MetaMask or compatible wallet for testing
+- Node.js 18+ and npm
+- A wallet (MetaMask, WalletConnect, etc.)
+- API keys for external services (see Environment Variables)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/your-username/token-teller.git
    cd token-teller
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Set up environment variables in `.env.local`:
+3. **Set up environment variables**
+   Create a `.env.local` file in the root directory:
    ```env
+   # OpenAI API Key
    NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
-   NEXT_PUBLIC_TEST_WALLET_ADDRESS=your_test_wallet_address
-   NEXT_PUBLIC_ETHEREUM_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_KEY
-   NEXT_PUBLIC_ZETACHAIN_RPC_URL=https://zetachain-evm.public.blastapi.io
+
+   # RPC URLs
+   NEXT_PUBLIC_ETHEREUM_RPC_URL=your_ethereum_sepolia_rpc_url
+   NEXT_PUBLIC_ZETACHAIN_RPC_URL=your_zetachain_testnet_rpc_url
+
+   # Dynamic Wallet Environment ID
+   NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID=your_dynamic_environment_id
+
+   # Supabase Configuration
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+   # Google AI (for image generation)
+   NEXT_PUBLIC_GOOGLE_AI_API_KEY=your_google_ai_api_key
    ```
 
-4. Run the development server:
+4. **Run the development server**
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. **Open your browser**
+   Navigate to [http://localhost:4000](http://localhost:4000)
 
-## Usage
+## 🏗️ Architecture
 
-1. Connect your wallet using MetaMask or WalletConnect.
-2. Select a chain (Ethereum or ZetaChain).
-3. Fetch your token balances.
-4. Generate a personalized BaZi fortune based on your portfolio.
-5. Ask follow-up questions in the chat interface.
+### Tech Stack
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS with custom mystical themes
+- **Blockchain**: wagmi, viem, ethers.js
+- **Wallet Integration**: Dynamic Labs SDK
+- **State Management**: React Query (TanStack Query)
+- **AI Services**: OpenAI GPT-3.5, Google Imagen
+- **Storage**: Supabase for image storage
+- **UI Components**: Radix UI primitives
 
-## Deployment
+### Project Structure
+```
+src/
+├── app/                    # Next.js app router
+│   ├── api/               # API routes
+│   │   ├── balance/       # Token balance fetching
+│   │   ├── chat/          # AI chat functionality
+│   │   └── fortune/       # Fortune generation
+│   ├── fortune/           # Fortune reading page
+│   └── page.tsx           # Home page
+├── components/            # React components
+│   ├── ui/               # Reusable UI components
+│   ├── Chat.tsx          # AI chat interface
+│   ├── HeroSection.tsx   # Landing page hero
+│   └── ...               # Other components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+│   ├── balanceService.ts # Blockchain balance fetching
+│   ├── imageService.ts   # AI image generation
+│   └── supabaseService.ts # Storage service
+└── contexts/             # React contexts
+```
 
-Deploy to Vercel for a live preview:
+## 🔧 API Endpoints
 
-1. Push to GitHub.
-2. Connect to Vercel and deploy.
-3. Set environment variables in Vercel dashboard.
+### POST `/api/fortune`
+Generate a personalized BaZi fortune reading.
 
-Note: The app may have build issues due to wagmi's SSR compatibility. If deployment fails, consider using a different hosting or adjusting the Next.js config for dynamic rendering.
+**Request Body:**
+```json
+{
+  "address": "0x...",
+  "chainIds": [11155111, 7001],
+  "birthDate": "2023-01-01T12:00:00.000Z"
+}
+```
 
-## Next Steps & Lessons Learned
+**Response:**
+```json
+{
+  "fortune": "Your mystical fortune text...",
+  "imageUrl": "https://supabase-url/fortune-image.png"
+}
+```
 
-- **Next Steps**: Add more chains, implement real-time balance updates, enhance AI prompts for better personalization, add user authentication for saved fortunes.
-- **Lessons**: Balancing MVP scope with feature completeness; importance of responsive design for mobile users; integrating multiple APIs requires careful error handling.
+### POST `/api/chat`
+Chat with the AI oracle about your fortune.
 
-## Contributing
+**Request Body:**
+```json
+{
+  "messages": [
+    {"role": "user", "content": "What does my fortune mean?"}
+  ],
+  "fortune": "Your previous fortune reading..."
+}
+```
 
-Feel free to open issues or submit PRs for improvements!
+### POST `/api/balance`
+Fetch token balances for connected wallets.
 
-## License
+**Request Body:**
+```json
+{
+  "address": "0x...",
+  "chainIds": [11155111, 7001]
+}
+```
 
-MIT
+## 🌐 Supported Networks
+
+| Network | Chain ID | Purpose |
+|---------|----------|---------|
+| Ethereum Sepolia | 11155111 | Testnet for Ethereum-based tokens |
+| ZetaChain Testnet | 7001 | Cross-chain functionality testing |
+
+## 🎯 Key Components
+
+### [`BalanceService`](src/lib/balanceService.ts)
+Handles multi-chain token balance fetching with USD pricing integration via CoinGecko API.
+
+### [`FortuneAPI`](src/app/api/fortune/route.ts)
+Generates personalized BaZi fortune readings using OpenAI GPT and creates mystical imagery with Google Imagen.
+
+### [`Chat Component`](src/components/Chat.tsx)
+Interactive AI chat interface for asking questions about fortune readings.
+
+### [`Dynamic Wallet Integration`](src/components/DynamicWallet.tsx)
+Seamless wallet connection supporting multiple providers and networks.
+
+## 🎨 Customization
+
+### Themes
+The app uses a custom mystical theme with:
+- Cosmic color palette (purples, golds, blues)
+- Galaxy particle effects
+- Ethereal animations and transitions
+- Custom fonts (Orbitron for mystical text)
+
+### Adding New Chains
+1. Update [`wagmi.ts`](src/lib/wagmi.ts) with new chain configuration
+2. Add RPC URLs to [`balanceService.ts`](src/lib/balanceService.ts)
+3. Update token list in [`tokenList.ts`](src/lib/tokenList.ts)
+
+### Extending Fortune Logic
+Modify the prompt in [`fortune/route.ts`](src/app/api/fortune/route.ts) to customize:
+- BaZi calculation methods
+- Fortune interpretation styles
+- Additional astrological elements
+
+## 🔒 Security Considerations
+
+- API keys are properly configured as environment variables
+- Wallet connections use secure Dynamic Labs SDK
+- Input validation on all API endpoints
+- Rate limiting recommended for production deployment
+
+## 🙏 Acknowledgments
+
+- **BaZi Tradition**: Ancient Chinese fortune telling wisdom
+- **Dynamic Labs**: Wallet integration infrastructure
+- **OpenAI**: AI-powered fortune generation
+- **Google Imagen**: Mystical image creation
+- **Supabase**: Reliable storage solutions
+- **Vercel**: Seamless deployment platform
+
+## 🤔 Decision making
+Due to time constrain I pulled off the modest MVP ever, persistation and best system-design/code practices were avoided to prevent delays on the delivery. Here is a comparative list of thing i would have done differently with proper time:
+
+| Feature | Current implementation | Desired implementation |
+| :------ | :---------------: | -----------------------: |
+| Date Birth Persistant  | Local Storage | DB + webhooks |
+| Fortune and Chat Persistant | - | DB
+| Session | By wallet widget | By wallet widget + custom auto-singup-in with wallet address + webhooks |
+| Wallet balance | Hitting CoinGecko api always for USD value comparison | Redis + TTL logic + multiple currency-crypto API |
+| UI & UX | basic  | tailored theme + logo/s |
+| NFT & media sharing | -  | On fortune result and images generated  |
+
+---
+
+
+## ✉️ Contact (anicarrr@gmail.com).
