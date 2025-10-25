@@ -213,10 +213,10 @@ Modify the prompt in [`fortune/route.ts`](src/app/api/fortune/route.ts) to custo
 - **Vercel**: Seamless deployment platform
 
 ## 🤔 Decision making
-Due to time constrain I pulled off the modest MVP ever, persistation and best system-design/code practices were avoided to prevent delays on the delivery. Here is a comparative list of thing i would have done differently with proper time:
+Due to time constrain I pulled off the modest MVP ever, persistation and best system-design/code practices were avoided to prevent delays on the delivery. Here is a comparative list of things i would have done differently with proper time:
 
 | Feature | Current implementation | Desired implementation |
-| :------ | :---------------: | -----------------------: |
+| :------ | :---------------: | :-----------------------: |
 | Date Birth Persistant  | Local Storage | DB + webhooks |
 | Fortune and Chat Persistant | - | DB
 | Session | By wallet widget | By wallet widget + custom auto-singup-in with wallet address + webhooks |
